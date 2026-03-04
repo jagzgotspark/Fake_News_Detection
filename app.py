@@ -5,6 +5,7 @@ import re
 import pandas as pd
 import joblib
 import nltk
+from explain import generate_explanation, impact_analysis, plausibility_check
 
 # ---------- PAGE SETUP ----------
 st.set_page_config(page_title="Fake News Detection", layout="centered")
@@ -62,6 +63,35 @@ if st.button("Detect"):
             st.success(f"✅ Real News ({confidence:.2f}% confidence)")
         else:
             st.error(f"❌ Fake News ({confidence:.2f}% confidence)")
+
+        # ---------- CLAIM PLAUSIBILITY CHECK ----------
+
+        st.subheader("🔍 Claim Plausibility Analysis")
+
+        plausibility = plausibility_check(user_input)
+
+        for p in plausibility:
+            st.write(f"• {p}")
+
+       # ---------- AI FACT CHECK ANALYSIS ----------
+        analysis = generate_explanation(user_input, final_label)
+
+        st.subheader("🧠 AI Fact-Check Analysis")
+
+        for point in analysis["analysis"]:
+            st.write(f"• {point}")
+
+        st.subheader("📊 Overall Assessment")
+        st.info(analysis["summary"])
+
+
+        #---------- IMPACT ANALYSIS ----------
+        st.subheader("🌍 Potential Impact of This News")
+
+        impacts = impact_analysis(user_input)
+
+        for impact in impacts:
+            st.write(f"• {impact}")
 
         # ---------- UNCERTAINTY HANDLING ----------
         if confidence < 85 and confidence > 60:
